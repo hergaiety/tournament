@@ -29,8 +29,6 @@ defmodule Tournament do
   """
   @spec tally(input :: list(String.t())) :: String.t()
   def tally(input) do
-    initial_output = "#{@team}                           | #{acronym(@matches)} |  #{acronym(@win)} |  #{acronym(@draw)} |  #{acronym(@loss)} |  #{acronym(@points)}"
-
     input
     |> Enum.reduce(%{}, fn line, state ->
       [team1, team2, outcome] = parse_input(line)
@@ -56,23 +54,25 @@ defmodule Tournament do
     end)
     |> Enum.to_list()
     |> Enum.sort_by(fn {_key, %{points: points}} -> points end, :desc)
-    |> Enum.reduce(initial_output, fn {team, tally}, acc ->
-      Enum.join([acc, "\n", team_stats_to_string(team, tally)])
+    |> Enum.reduce(headline(), fn {team, tally}, acc ->
+      Enum.join([acc, "\n", team_stats_to_formatted_line(team, tally)])
     end)
   end
 
   defp parse_input(input), do: String.split(input, @separator_input)
 
-  defp team_stats_to_string(team, %{mp: mp, wins: wins, draws: draws, losses: losses, points: points}) do
-    [
-      String.pad_trailing(team, @pad_team),
-      String.pad_leading("#{mp}", @pad_value),
-      String.pad_leading("#{wins}", @pad_value),
-      String.pad_leading("#{draws}", @pad_value),
-      String.pad_leading("#{losses}", @pad_value),
-      String.pad_leading("#{points}", @pad_value)
-    ]
-    |> Enum.join(@separator_output)
+  defp headline(), do:
+    format_line([@team, acronym(@matches), acronym(@win), acronym(@draw), acronym(@loss), acronym(@points)])
+
+  defp format_line([team | values]), do: [
+    String.pad_trailing(team, @pad_team) |
+      values |> Enum.map(&(
+        String.pad_leading(to_string(&1), @pad_value)
+      ))
+  ] |> Enum.join(@separator_output)
+
+  defp team_stats_to_formatted_line(team, %{mp: mp, wins: wins, draws: draws, losses: losses, points: points}) do
+    format_line([team, mp, wins, draws, losses, points])
   end
 
   defp update_tally(state, team, tally) do
