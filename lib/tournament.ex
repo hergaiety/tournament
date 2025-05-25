@@ -44,11 +44,11 @@ defmodule Tournament do
     end)
   end
 
-  def parse_line(line) do
+  defp parse_line(line) do
     String.split(line, ";")
   end
 
-  def team_line(team, %{mp: mp, wins: wins, draws: draws, losses: losses, points: points}) do
+  defp team_line(team, %{mp: mp, wins: wins, draws: draws, losses: losses, points: points}) do
     [
       String.pad_trailing(team, 30),
       String.pad_leading("#{mp}", 2),
@@ -60,19 +60,19 @@ defmodule Tournament do
     |> Enum.join(" | ")
   end
 
-  def update_tally(state, team, tally) do
+  defp update_tally(state, team, tally) do
     Map.put(state, team, tally)
   end
 
-  def apply_team(%{wins: wins, points: points, mp: mp} = team, "win") do
+  defp apply_team(%{wins: wins, points: points, mp: mp} = team, "win") do
     %{team | wins: wins + 1, points: points + 3, mp: mp + 1}
   end
 
-  def apply_team(%{losses: losses, points: points, mp: mp} = team, "loss") do
+  defp apply_team(%{losses: losses, points: points, mp: mp} = team, "loss") do
     %{team | losses: losses + 1, points: points + 0, mp: mp + 1}
   end
 
-  def apply_team(%{draws: draws, points: points, mp: mp} = team, "draw") do
+  defp apply_team(%{draws: draws, points: points, mp: mp} = team, "draw") do
     %{team | draws: draws + 1, points: points + 1, mp: mp + 1}
   end
 end
