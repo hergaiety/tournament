@@ -30,8 +30,8 @@ defmodule Tournament do
   @spec tally(input :: list(String.t())) :: String.t()
   def tally(input) do
     input
-    |> Enum.reduce(%{}, fn line, state ->
-      [team1, team2, outcome] = parse_input(line)
+    |> Stream.map(&parse_input_line_values/1)
+    |> Enum.reduce(%{}, fn [team1, team2, outcome], state ->
       team1_tally = Map.get(state, team1, %{mp: @value_default, wins: @value_default, losses: @value_default, draws: @value_default, points: @value_default})
       team2_tally = Map.get(state, team2, %{mp: @value_default, wins: @value_default, losses: @value_default, draws: @value_default, points: @value_default})
 
@@ -58,7 +58,7 @@ defmodule Tournament do
     end)
   end
 
-  defp parse_input(input), do: String.split(input, @separator_input)
+  defp parse_input_line_values(input), do: String.split(input, @separator_input)
 
   defp headline(), do:
     format_line([@team, acronym(@matches), acronym(@win), acronym(@draw), acronym(@loss), acronym(@points)])
