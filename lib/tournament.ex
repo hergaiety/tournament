@@ -31,26 +31,13 @@ defmodule Tournament do
   def tally(input) do
     input
     |> Stream.map(&parse_input_line_values/1)
+    # TODO: Convert to Stream.transform/3
     |> Enum.reduce(%{}, fn [team1, team2, outcome], state ->
-      team1_tally = Map.get(state, team1, %{mp: @value_default, wins: @value_default, losses: @value_default, draws: @value_default, points: @value_default})
-      team2_tally = Map.get(state, team2, %{mp: @value_default, wins: @value_default, losses: @value_default, draws: @value_default, points: @value_default})
-
-      case outcome do
-        @win ->
-          state
-          |> update_tally(team1, update_team_map(team1_tally, @win))
-          |> update_tally(team2, update_team_map(team2_tally, @loss))
-
-        @loss ->
-          state
-          |> update_tally(team1, update_team_map(team1_tally, @loss))
-          |> update_tally(team2, update_team_map(team2_tally, @win))
-
-        @draw ->
-          state
-          |> update_tally(team1, update_team_map(team1_tally, @draw))
-          |> update_tally(team2, update_team_map(team2_tally, @draw))
-      end
+      update_tallies(state,
+        get_team_tally(state, team1),
+        get_team_tally(state, team2),
+        outcome
+      )
     end)
     |> Enum.sort_by(fn {_key, %{points: points}} -> points end, :desc)
     |> Enum.reduce(headline(), fn {team, tally}, acc ->
@@ -74,22 +61,39 @@ defmodule Tournament do
     format_line([team, mp, wins, draws, losses, points])
   end
 
-  defp update_tally(state, team, tally) do
-    Map.put(state, team, tally)
-  end
+  defp get_team_tally(state, team), do: {
+    team,
+    Map.get(state, team, %{mp: @value_default, wins: @value_default, losses: @value_default, draws: @value_default, points: @value_default})
+  }
 
-  defp update_team_map(%{wins: wins, points: points, mp: mp} = team, @win) do
-    %{team | wins: wins + 1, points: points + @points_win, mp: mp + 1}
-  end
+  defp update_tally(state, team, tally), do: Map.put(state, team, tally)
 
-  defp update_team_map(%{losses: losses, points: points, mp: mp} = team, @loss) do
-    %{team | losses: losses + 1, points: points + @points_loss, mp: mp + 1}
-  end
+  # NOTE: A team losing means the other team won, so we rearrange the arguments for a win condition
+  defp update_tallies(state, {team1, team1_tally}, {team2, team2_tally}, @loss), do:
+    update_tallies(state, {team2, team2_tally}, {team1, team1_tally}, @win)
+  defp update_tallies(state, {team1, team1_tally}, {team2, team2_tally}, @win), do:
+    state
+    |> update_tally(team1, update_team_map(team1_tally, @win))
+    |> update_tally(team2, update_team_map(team2_tally, @loss))
+  defp update_tallies(state, {team1, team1_tally}, {team2, team2_tally}, _draw), do:
+    state
+    |> update_tally(team1, update_team_map(team1_tally, @draw))
+    |> update_tally(team2, update_team_map(team2_tally, @draw))
 
-  defp update_team_map(%{draws: draws, points: points, mp: mp} = team, @draw) do
-    %{team | draws: draws + 1, points: points + @points_draw, mp: mp + 1}
-  end
+  defp update_team_map(%{wins: wins, points: points} = team, @win), do:
+    update_team_map(%{team | wins: wins + 1, points: points + @points_win})
 
+  defp update_team_map(%{losses: losses, points: points} = team, @loss), do:
+    update_team_map(%{team | losses: losses + 1, points: points + @points_loss})
+
+  defp update_team_map(%{draws: draws, points: points} = team, @draw), do:
+    update_team_map(%{team | draws: draws + 1, points: points + @points_draw})
+
+  # NOTE: Always want to call this, any match outcome is a match played
+  defp update_team_map(%{mp: mp} = team), do:
+    %{team | mp: mp + 1}
+
+  # NOTE: Will need to be more clever if localized
   defp acronym(string), do:
     string
     |> String.split(" ")

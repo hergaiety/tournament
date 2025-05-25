@@ -202,9 +202,12 @@ defmodule TournamentTest do
     # Invalid input lines in an otherwise-valid game still results in valid
     # output.
     input = [
+      # FIXME: Investigate filtering out empty lines, be sure to trim them!
       "",
+      # FIXME: Investigate multiple seperator support on parse_input_line_values/1, such as String.split(line. @list_of_separators) CAREFUL! Team names may include these characters
       "Allegoric Alaskans@Blithering Badgers;draw",
       "Blithering Badgers;Devastating Donkeys;loss",
+      # FIXME: Investigate Enum.take(3) on parse_input_line_values/1
       "Devastating Donkeys;Courageous Californians;win;5",
       "Courageous Californians;Allegoric Alaskans;los"
     ]
