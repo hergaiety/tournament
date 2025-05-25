@@ -52,7 +52,6 @@ defmodule Tournament do
           |> update_tally(team2, update_team_map(team2_tally, @draw))
       end
     end)
-    |> Enum.to_list()
     |> Enum.sort_by(fn {_key, %{points: points}} -> points end, :desc)
     |> Enum.reduce(headline(), fn {team, tally}, acc ->
       Enum.join([acc, "\n", team_stats_to_formatted_line(team, tally)])
