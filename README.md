@@ -2,6 +2,12 @@ Kindly taken from https://exercism.org/tracks/elixir/exercises/tournament
 
 Full credits to problem definition and project setup to the original authors.
 
+# Refactor - Interview Notes
+
+1. Modify `CONTRIBUTING.md` or any similar developer setup instructions to refer to `.tool-versions` with [mise](https://mise.jdx.dev) or [asdf](https://asdf-vm.com)
+  - _Why?_: Avoids "which version" and "how do I install X" questions.
+  - Less assumptions, explicit tooling standards, less "works on my machine"
+
 # Tolemi - Interview Exercise
 
 This repository is used as an interview exercise for engineering candidates.
