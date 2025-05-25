@@ -8,6 +8,14 @@ defmodule Tournament do
   @draw "draw"
   @points "points"
 
+  @value_default 0
+  @points_win 3
+  @points_draw 1
+  @points_loss 0
+
+  @pad_team 30
+  @pad_value 2
+
   @doc """
   Given `input` lines representing two teams and whether the first of them won,
   lost, or reached a draw, separated by semicolons, calculate the statistics
@@ -26,8 +34,8 @@ defmodule Tournament do
     input
     |> Enum.reduce(%{}, fn line, state ->
       [team1, team2, outcome] = parse_input(line)
-      team1_tally = Map.get(state, team1, %{mp: 0, wins: 0, losses: 0, draws: 0, points: 0})
-      team2_tally = Map.get(state, team2, %{mp: 0, wins: 0, losses: 0, draws: 0, points: 0})
+      team1_tally = Map.get(state, team1, %{mp: @value_default, wins: @value_default, losses: @value_default, draws: @value_default, points: @value_default})
+      team2_tally = Map.get(state, team2, %{mp: @value_default, wins: @value_default, losses: @value_default, draws: @value_default, points: @value_default})
 
       case outcome do
         @win ->
@@ -57,12 +65,12 @@ defmodule Tournament do
 
   defp team_stats_to_string(team, %{mp: mp, wins: wins, draws: draws, losses: losses, points: points}) do
     [
-      String.pad_trailing(team, 30),
-      String.pad_leading("#{mp}", 2),
-      String.pad_leading("#{wins}", 2),
-      String.pad_leading("#{draws}", 2),
-      String.pad_leading("#{losses}", 2),
-      String.pad_leading("#{points}", 2)
+      String.pad_trailing(team, @pad_team),
+      String.pad_leading("#{mp}", @pad_value),
+      String.pad_leading("#{wins}", @pad_value),
+      String.pad_leading("#{draws}", @pad_value),
+      String.pad_leading("#{losses}", @pad_value),
+      String.pad_leading("#{points}", @pad_value)
     ]
     |> Enum.join(@separator_output)
   end
@@ -72,15 +80,15 @@ defmodule Tournament do
   end
 
   defp update_team_map(%{wins: wins, points: points, mp: mp} = team, @win) do
-    %{team | wins: wins + 1, points: points + 3, mp: mp + 1}
+    %{team | wins: wins + 1, points: points + @points_win, mp: mp + 1}
   end
 
   defp update_team_map(%{losses: losses, points: points, mp: mp} = team, @loss) do
-    %{team | losses: losses + 1, points: points + 0, mp: mp + 1}
+    %{team | losses: losses + 1, points: points + @points_loss, mp: mp + 1}
   end
 
   defp update_team_map(%{draws: draws, points: points, mp: mp} = team, @draw) do
-    %{team | draws: draws + 1, points: points + 1, mp: mp + 1}
+    %{team | draws: draws + 1, points: points + @points_draw, mp: mp + 1}
   end
 
   defp acronym(string), do:
