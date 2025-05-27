@@ -1,7 +1,6 @@
 defmodule TournamentTest do
   use ExUnit.Case
 
-  # @tag :pending
   test "just the header if no input" do
     input = []
 
@@ -14,7 +13,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "a win is three points, a loss is zero points" do
     input = [
       "Allegoric Alaskans;Blithering Badgers;win"
@@ -31,7 +29,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "a win can also be expressed as a loss" do
     input = [
       "Blithering Badgers;Allegoric Alaskans;loss"
@@ -48,7 +45,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "a different team can win" do
     input = [
       "Blithering Badgers;Allegoric Alaskans;win"
@@ -65,7 +61,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "a draw is one point each" do
     input = [
       "Allegoric Alaskans;Blithering Badgers;draw"
@@ -82,7 +77,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "There can be more than one match" do
     input = [
       "Allegoric Alaskans;Blithering Badgers;win",
@@ -100,7 +94,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "There can be more than one winner" do
     input = [
       "Allegoric Alaskans;Blithering Badgers;loss",
@@ -118,7 +111,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "There can be more than two teams" do
     input = [
       "Allegoric Alaskans;Blithering Badgers;win",
@@ -138,7 +130,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "typical input" do
     input = [
       "Allegoric Alaskans;Blithering Badgers;win",
@@ -162,7 +153,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "incomplete competition (not all pairs have played)" do
     input = [
       "Allegoric Alaskans;Blithering Badgers;loss",
@@ -184,7 +174,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "ties broken alphabetically" do
     input = [
       "Courageous Californians;Devastating Donkeys;win",
@@ -213,9 +202,12 @@ defmodule TournamentTest do
     # Invalid input lines in an otherwise-valid game still results in valid
     # output.
     input = [
+      # FIXME: Investigate filtering out empty lines, be sure to trim them!
       "",
+      # FIXME: Investigate multiple seperator support on parse_input_line_values/1, such as String.split(line. @list_of_separators) CAREFUL! Team names may include these characters
       "Allegoric Alaskans@Blithering Badgers;draw",
       "Blithering Badgers;Devastating Donkeys;loss",
+      # FIXME: Investigate Enum.take(3) on parse_input_line_values/1
       "Devastating Donkeys;Courageous Californians;win;5",
       "Courageous Californians;Allegoric Alaskans;los"
     ]
@@ -231,7 +223,6 @@ defmodule TournamentTest do
     assert Tournament.tally(input) == expected
   end
 
-  # @tag :pending
   test "ensure points sorted numerically" do
     input = [
       "Devastating Donkeys;Blithering Badgers;win",
